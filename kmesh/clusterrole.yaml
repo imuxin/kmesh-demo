@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kmesh
+  labels:
+    app: kmesh
+rules:
+- apiGroups: [""]
+  resources: ["pods","services","namespaces","nodes"]
+  verbs: ["get", "update", "patch", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["daemonsets"]
+  verbs: ["get"]
+- apiGroups: ["kmesh.net"]
+  resources: ["kmeshnodeinfos"]
+  verbs: ["get", "create", "update", "delete", "list", "watch"]

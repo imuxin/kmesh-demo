@@ -1,0 +1,15 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  profile: minimal
+  meshConfig:
+    enableTracing: true
+    image:
+      imageType: distroless
+  components:
+    pilot:
+      k8s:
+        env:
+        - name: "PILOT_ENABLE_AMBIENT"
+          value: "true"
+

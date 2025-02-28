@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netshoot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: netshoot
+  template:
+    metadata:
+      labels:
+        app: netshoot
+    spec:
+      containers:
+      - name: netshoot
+        image: nicolaka/netshoot:latest
+        imagePullPolicy: IfNotPresent
+        command: ["sleep"]
+        args:
+        - 100d
+        ports:
+        - containerPort: 80
+      # Pod Anti-Affinity 设置
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: netshoot
+            topologyKey: "kubernetes.io/hostname"  # 防止 Pod 在同一节点上调度

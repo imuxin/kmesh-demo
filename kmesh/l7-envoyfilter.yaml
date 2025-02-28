@@ -1,0 +1,124 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: add-listener-filter
+  namespace: istio-system
+spec:
+  workloadSelector:
+    labels:
+      gateway.istio.io/managed: istio.io-mesh-controller
+  configPatches:
+  - applyTo: LISTENER
+    patch:
+      operation: ADD
+      value:
+        name: kmesh-listener
+        address:
+          socket_address:
+            protocol: TCP
+            address: 0.0.0.0
+            port_value: 15019
+        additional_addresses:
+        - address:
+            socket_address:
+              protocol: TCP
+              address: "::"
+              port_value: 15019
+        default_filter_chain:
+          filters:
+          - name: envoy.filters.network.tcp_proxy
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
+              stat_prefix: kmesh
+              cluster: main_internal
+        filter_chains:
+        - filter_chain_match:
+            application_protocols:
+            - "http/1.1"
+            - "h2c"
+          filters:
+          - name: envoy.filters.network.http_connection_manager
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+              stat_prefix: kmesh
+              route_config:
+                name: default
+                virtual_hosts:
+                - name: default
+                  domains:
+                  - '*'
+                  routes:
+                  - match:
+                      prefix: "/"
+                    route:
+                      cluster: main_internal
+              http_filters:
+              - name: waypoint_downstream_peer_metadata
+                typed_config:
+                  "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+                  type_url: type.googleapis.com/io.istio.http.peer_metadata.Config
+                  value:
+                    downstream_discovery:
+                    - workload_discovery: {}
+                    shared_with_upstream: true
+              - name: envoy.filters.http.router
+                typed_config:
+                  "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+        listener_filters:
+        - name: "envoy.listener.kmesh_tlv"
+          typed_config:
+            "@type": "type.googleapis.com/udpa.type.v1.TypedStruct"
+            "type_url": "type.googleapis.com/envoy.listener.kmesh_tlv.config.KmeshTlv"
+        - name: "envoy.filters.listener.http_inspector"
+          typed_config:
+            "@type": "type.googleapis.com/envoy.extensions.filters.listener.http_inspector.v3.HttpInspector"
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: skip-tunneling
+  namespace: istio-system
+spec:
+  workloadSelector:
+    labels:
+      gateway.istio.io/managed: istio.io-mesh-controller
+  configPatches:
+  - applyTo: NETWORK_FILTER
+    match:
+      listener:
+        filterChain:
+          filter:
+            name: envoy.filters.network.tcp_proxy
+    patch:
+      operation: REPLACE
+      value:
+        name: envoy.filters.network.tcp_proxy
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
+          stat_prefix: kmesh_original_dst_cluster
+          cluster: kmesh_original_dst_cluster
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: add-original-dst-cluster
+  namespace: istio-system
+spec:
+  workloadSelector:
+    labels:
+      gateway.istio.io/managed: istio.io-mesh-controller
+  configPatches:
+  - applyTo: CLUSTER
+    match:
+      context: SIDECAR_INBOUND
+    patch:
+      operation: ADD
+      value:
+        name: "kmesh_original_dst_cluster"
+        type: ORIGINAL_DST
+        connect_timeout: 2s
+        lb_policy: CLUSTER_PROVIDED

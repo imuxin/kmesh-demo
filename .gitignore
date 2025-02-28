@@ -1,0 +1,8 @@
+.bash_history
+.bash_logout
+.cache/
+.kube/
+.profile
+.ssh/
+.viminfo
+.wget-hsts
