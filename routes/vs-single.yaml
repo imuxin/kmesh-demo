@@ -2,7 +2,9 @@ apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
   name: backend
-  namespace: webapp
+  namespace: kmesh-demo
+  labels:
+    istio.io/use-waypoint: waypoint # svc 接入 L7 waypoint 代理
 spec:
   hosts:
   - backend
@@ -13,8 +15,8 @@ spec:
           test: "true"
     route:
     - destination:
-        host: backend-v2.webapp.svc.cluster.local
-      weight: 25
+        host: backend-v2.kmesh-demo.svc.cluster.local
+      weight: 10
     - destination:
-        host: backend-v1.webapp.svc.cluster.local
-      weight: 75
+        host: backend-v1.kmesh-demo.svc.cluster.local
+      weight: 90

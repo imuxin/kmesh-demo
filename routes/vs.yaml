@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
   name: backend
-  namespace: webapp
+  namespace: kmesh-demo
 spec:
   hosts:
   - backend

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: netshoot
+  namespace: kmesh-demo
 spec:
   replicas: 2
   selector:
@@ -10,15 +11,16 @@ spec:
   template:
     metadata:
       labels:
+        istio.io/dataplane-mode: Kmesh
         app: netshoot
     spec:
       containers:
       - name: netshoot
         image: nicolaka/netshoot:latest
         imagePullPolicy: IfNotPresent
-        command: ["sleep"]
+        command: [ "sleep" ]
         args:
-        - 100d
+        - 1000d
         ports:
         - containerPort: 80
       # Pod Anti-Affinity 设置
@@ -28,4 +30,4 @@ spec:
           - labelSelector:
               matchLabels:
                 app: netshoot
-            topologyKey: "kubernetes.io/hostname"  # 防止 Pod 在同一节点上调度
+            topologyKey: "kubernetes.io/hostname" # 防止 Pod 在同一节点上调度

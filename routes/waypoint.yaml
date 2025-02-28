@@ -1,15 +1,16 @@
 #
-# kmeshctl waypoint generate -n webapp  --for service --image slic/kmesh-waypoint:v1.0.0
-# 
+# kmeshctl waypoint generate -n kmesh-demo  --for service --image slic/kmesh-waypoint:v1.0.0
+#
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   annotations:
     sidecar.istio.io/proxyImage: slic/kmesh-waypoint:v1.0.0
   labels:
+    istio.io/rev: 1-24
     istio.io/waypoint-for: service
   name: waypoint
-  namespace: webapp
+  namespace: kmesh-demo
 spec:
   gatewayClassName: istio-waypoint
   listeners:

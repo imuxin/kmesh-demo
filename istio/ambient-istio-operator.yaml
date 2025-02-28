@@ -2,6 +2,7 @@ apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 spec:
   profile: minimal
+  revision: 1-24
   meshConfig:
     enableTracing: true
     image:
@@ -12,4 +13,3 @@ spec:
         env:
         - name: "PILOT_ENABLE_AMBIENT"
           value: "true"
-

@@ -2,8 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-v2
-  namespace: webapp
+  namespace: kmesh-demo
 spec:
+  replicas: 1
   minReadySeconds: 3
   revisionHistoryLimit: 5
   progressDeadlineSeconds: 60
@@ -21,10 +22,11 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9797"
       labels:
+        istio.io/dataplane-mode: Kmesh
         app: backend
         version: v2
     spec:
-      serviceAccountName: webapp
+      serviceAccountName: kmesh-demo
       containers:
       - name: backend-v2
         image: ghcr.io/stefanprodan/podinfo:6.7.1

@@ -2,7 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: backend
-  namespace: webapp
+  namespace: kmesh-demo
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

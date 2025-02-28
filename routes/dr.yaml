@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: backend
-  namespace: webapp
+  namespace: kmesh-demo
 spec:
   host: backend
   subsets:
