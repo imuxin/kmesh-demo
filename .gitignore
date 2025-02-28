@@ -1,7 +1,9 @@
 .bash_history
 .bash_logout
 .cache/
+.gitconfig
 .kube/
+.lesshst
 .profile
 .ssh/
 .viminfo
