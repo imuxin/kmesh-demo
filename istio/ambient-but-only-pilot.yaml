@@ -5,8 +5,8 @@ spec:
   revision: 1-24
   meshConfig:
     enableTracing: true
-    image:
-      imageType: distroless
+#   image:
+#     imageType: distroless
   components:
     pilot:
       k8s:
