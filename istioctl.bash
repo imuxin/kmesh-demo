@@ -1,4 +1,5 @@
 # bash completion for istioctl                             -*- shell-script -*-
+# generate: `istioctl collateral completion --bash -o .`
 
 __istioctl_debug()
 {
